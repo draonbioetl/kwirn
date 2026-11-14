@@ -308,6 +308,29 @@ class Handler(BaseHTTPRequestHandler):
         self.fail(404, 'Not found')
 
 
+def start_keepalive():
+    """Free hosts (Render) sleep after 15 idle minutes. Pinging our own public URL every
+    10 minutes counts as visitor traffic, so the site stays awake. KEEPALIVE=0 turns it off."""
+    url = os.environ.get('RENDER_EXTERNAL_URL') or os.environ.get('KEEPALIVE_URL')
+    if not url or os.environ.get('KEEPALIVE') == '0':
+        return
+    import urllib.request
+    target = url.rstrip('/') + '/api/hello?keepalive=1'
+    every = int(os.environ.get('KEEPALIVE_SECS', '600'))
+
+    def loop():
+        while True:
+            time.sleep(every)
+            try:
+                with urllib.request.urlopen(target, timeout=30) as r:
+                    r.read()
+            except Exception as e:
+                print(f'  keepalive ping failed: {e}', flush=True)
+
+    threading.Thread(target=loop, daemon=True).start()
+    print(f'  keepalive: pinging {target} every {every} s', flush=True)
+
+
 def main():
     global PORT
     ap = argparse.ArgumentParser(description='Kwirn LAN server')
@@ -322,6 +345,7 @@ def main():
         srv.daemon_threads = True
         PORT = srv.server_address[1]
         print(f'Kwirn server listening on port {PORT}', flush=True)
+        start_keepalive()
         srv.serve_forever()
         return
     for port in range(args.port, args.port + 20):

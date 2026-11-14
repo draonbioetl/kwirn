@@ -1,0 +1,22 @@
+# Checks the live site every 10 minutes. This also wakes it if it has gone to sleep.
+# If the site doesn't answer within about 3 minutes, the run fails and GitHub emails the repo owner.
+name: Site watchdog
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Ping kwirn.onrender.com
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS --max-time 30 "https://kwirn.onrender.com/api/hello?watchdog=1"; then
+              echo; echo "Site is up (attempt $i)"; exit 0
+            fi
+            echo "Attempt $i failed, retrying..."; sleep 5
+          done
+          echo "::error::kwirn.onrender.com did not answer for about 3 minutes. Restart it from the Render dashboard (Manual Deploy > Restart service)."
+          exit 1
