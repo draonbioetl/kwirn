@@ -2579,7 +2579,7 @@ DL.SEARCH.setValueNet({"mu":[0.7143117193582187,0.7098990031910623,0.08786175728
     const alt = ips.slice(1, 3).map(ip => `<code>${inviteURL(ip)}</code>`).join('<br>');
     showCard('invite', `<div class="kick">${I.wifi} Network game</div><h3>Invite a friend</h3><p>${netPublic() ? 'Send this link to a friend.' : 'Send this link to someone on the same Wi-Fi.'} The game starts as soon as they open it.</p>
       <div class="lan-link"><input id="lanUrl" readonly value="${url}"><button id="lanCopy">${I.copy}Copy</button></div>
-      <div class="lan-code"><span>or type the address and use code</span><b>${NET.code}</b></div>
+      <div class="lan-code"><span>Game code</span><b>${NET.code}</b></div>
       ${alt ? `<div class="lan-alt">Link not loading for them? Try<br>${alt}</div>` : ''}
       <div class="lan-wait"><span class="pulse"></span><span>Waiting for your friend to join…</span></div>
       <div class="lan-actions"><button class="btn" id="lanCancel">Cancel invite</button></div>`);
