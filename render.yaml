@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: kwirn
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python kwirn_server.py
+    healthCheckPath: /api/hello
+    autoDeploy: true
